@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  stub:
+    build:
+      context: .
+      dockerfile: ./cmd/stub/Dockerfile
+    ports:
+      - 8080:8080
+
