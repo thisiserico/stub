@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-func (c *Client) handler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("handling %s %s %s", r.Method, r.URL.RequestURI(), flattenHeaders(r))
+func (c *Client) fetchResponse(w http.ResponseWriter, r *http.Request) {
+	log.Printf("fetching response for %s %s %s", r.Method, r.URL.RequestURI(), flattenHeaders(r))
 }
 
 func flattenHeaders(r *http.Request) string {
