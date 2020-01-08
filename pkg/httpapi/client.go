@@ -1,9 +1,11 @@
 package httpapi
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"net/http"
+	"strings"
 
 	"github.com/thisiserico/stub/expectation"
 	"goji.io"
@@ -47,4 +49,13 @@ func (c *Client) Serve() {
 	if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
+}
+
+func flattenHeaders(headers map[string][]string) string {
+	flattened := make([]string, 0, len(headers))
+	for key, values := range headers {
+		flattened = append(flattened, fmt.Sprintf("%s:%s", key, values))
+	}
+
+	return strings.Join(flattened, " ")
 }

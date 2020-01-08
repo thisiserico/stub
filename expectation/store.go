@@ -14,15 +14,15 @@ type Store interface {
 // NewStore initializes a new response in memory store.
 func NewStore() Store {
 	return &store{
-		Mutex:     &sync.Mutex{},
-		endpoints: make(map[Endpoint]Response),
+		Mutex:        &sync.Mutex{},
+		expectations: make([]expectation, 0),
 	}
 }
 
 type store struct {
 	*sync.Mutex
 
-	endpoints map[Endpoint]Response
+	expectations []expectation
 }
 
 func (s *store) Register(e Endpoint, r Response) error {
@@ -30,8 +30,8 @@ func (s *store) Register(e Endpoint, r Response) error {
 	defer s.Unlock()
 
 	// TODO check whether it already exists, overwrite if so.
+	s.expectations = append(s.expectations, responseForEndpoint(e, r))
 
-	s.endpoints[e] = r
 	return nil
 }
 

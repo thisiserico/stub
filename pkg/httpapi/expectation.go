@@ -35,7 +35,11 @@ func (c *Client) registerExpectation(w http.ResponseWriter, r *http.Request) {
 		flattenHeaders(req.Headers),
 	)
 
-	endpoint, err := expectation.For(req.Method, req.Path, req.Headers)
+	endpoint, err := expectation.For(
+		strings.ToUpper(req.Method),
+		req.Path,
+		req.Headers,
+	)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("invalid expectation"))
