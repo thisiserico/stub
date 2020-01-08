@@ -10,10 +10,10 @@ import (
 )
 
 type expectationRequest struct {
-	Method   string  `json:"method"`
-	Path     string  `json:"path"`
-	Headers  headers `json:"headers"`
-	Response []byte  `json:"response"`
+	Method   string          `json:"method"`
+	Path     string          `json:"path"`
+	Headers  headers         `json:"headers"`
+	Response json.RawMessage `json:"response"`
 }
 
 type headers map[string][]string

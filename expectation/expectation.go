@@ -11,3 +11,7 @@ func responseForEndpoint(e Endpoint, r Response) expectation {
 		response: r,
 	}
 }
+
+func (e expectation) matches(endpoint Endpoint) bool {
+	return true
+}

@@ -36,5 +36,11 @@ func (s *store) Register(e Endpoint, r Response) error {
 }
 
 func (s *store) Fetch(e Endpoint) (Response, error) {
+	for _, expectation := range s.expectations {
+		if expectation.matches(e) {
+			return expectation.response, nil
+		}
+	}
+
 	return nonExistingResponse, errors.New("unknown endpoint")
 }

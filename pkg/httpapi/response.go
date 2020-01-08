@@ -28,5 +28,11 @@ func (c *Client) fetchResponse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(response.MockedBody())
+	js, err := response.MockedBody().MarshalJSON()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(js)
 }

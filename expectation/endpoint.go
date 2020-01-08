@@ -14,10 +14,8 @@ type Endpoint struct {
 
 // For returns either a valid endpoint or an error.
 func For(method, path string, headers map[string][]string) (Endpoint, error) {
-	var endpoint Endpoint
-
 	if !isAllowedHTTPMethod(method) {
-		return endpoint, fmt.Errorf("forbidden method %s", method)
+		return Endpoint{}, fmt.Errorf("forbidden method %s", method)
 	}
 
 	return Endpoint{
