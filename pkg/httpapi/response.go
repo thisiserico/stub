@@ -8,12 +8,17 @@ import (
 )
 
 func (c *Client) fetchResponse(w http.ResponseWriter, r *http.Request) {
-	log.Printf("fetching response for %s %s %s", r.Method, r.URL.RequestURI(), flattenHeaders(r))
+	log.Printf(
+		"fetching response for %s %s %s",
+		r.Method,
+		r.URL.RequestURI(),
+		flattenHeaders(r.Header),
+	)
 }
 
-func flattenHeaders(r *http.Request) string {
-	flattened := make([]string, 0, len(r.Header))
-	for key, values := range r.Header {
+func flattenHeaders(headers map[string][]string) string {
+	flattened := make([]string, 0, len(headers))
+	for key, values := range headers {
 		flattened = append(flattened, fmt.Sprintf("%s:%s", key, values))
 	}
 

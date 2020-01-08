@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/thisiserico/stub/expectation"
 	"goji.io"
 	"goji.io/pat"
 )
@@ -13,20 +14,22 @@ const port = ":8080"
 
 // Client allows to run an http API.
 type Client struct {
-	mux *goji.Mux
+	mux   *goji.Mux
+	store expectation.Store
 }
 
 // New constructs a new Client.
 func New() *Client {
 	return &Client{
-		mux: goji.NewMux(),
+		mux:   goji.NewMux(),
+		store: expectation.NewStore(),
 	}
 }
 
 // Serve runs an http server with a single handler to catch them all.
 func (c *Client) Serve() {
 	log.Println("registering stub routes")
-	c.mux.HandleFunc(pat.Post("/expectation"), c.registerExpectation)
+	c.mux.HandleFunc(pat.Put("/expectation"), c.registerExpectation)
 	c.mux.HandleFunc(pat.New("/*"), c.fetchResponse)
 
 	log.Printf("preparing network listener on port %s", port)
