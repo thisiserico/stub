@@ -6,11 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/lucsky/cuid"
 )
 
 const (
-	knownPath     = "/target/path/in/my/service"
-	knownResponse = "known response"
+	correlationIDHeader = "x-correlation-id"
+	knownPath           = "/target/path/in/my/service"
+	knownResponse       = "known response"
 )
 
 var serviceAddress = "http://localhost:8080"
@@ -35,13 +38,15 @@ func TestUsingAGetRequest(t *testing.T) {
 type testHandler struct {
 	*testing.T
 
+	correlationID  string
 	respStatusCode int
 	respBody       interface{}
 }
 
 func prepareTestHandler(t *testing.T) *testHandler {
 	return &testHandler{
-		T: t,
+		T:             t,
+		correlationID: cuid.New(),
 	}
 }
 
@@ -56,6 +61,7 @@ func (t *testHandler) givenAMockedGetEndpoint() {
 	js, _ := json.Marshal(expectationPayload{
 		Method:   http.MethodGet,
 		Path:     knownPath,
+		Headers:  map[string][]string{correlationIDHeader: {t.correlationID}},
 		Response: knownResponse,
 	})
 
@@ -79,6 +85,7 @@ func (t *testHandler) whenHittingAGetEndpoint() {
 	if err != nil {
 		t.Fatal(err)
 	}
+	req.Header.Set(correlationIDHeader, t.correlationID)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
