@@ -10,10 +10,13 @@ import (
 )
 
 type expectationRequest struct {
-	Method     string          `json:"using_method"`
-	Path       string          `json:"against_path"`
-	ReqHeaders headers         `json:"with_headers"`
-	Response   json.RawMessage `json:"with_response"`
+	Method     string  `json:"using_method"`
+	Path       string  `json:"against_path"`
+	ReqHeaders headers `json:"with_headers"`
+
+	StatusCode  int             `json:"returns_code"`
+	Response    json.RawMessage `json:"with_response"`
+	RespHeaders headers         `json:"and_headers"`
 }
 
 type headers map[string][]string
@@ -46,7 +49,11 @@ func (c *Client) registerExpectation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := expectation.ReplyWith(req.Response)
+	response, err := expectation.ReplyWith(
+		req.StatusCode,
+		req.Response,
+		req.RespHeaders,
+	)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("invalid expected response"))

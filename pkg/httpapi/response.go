@@ -28,11 +28,14 @@ func (c *Client) fetchResponse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if statusCode := response.MockedStatusCode(); statusCode != 0 {
+		w.WriteHeader(statusCode)
+	}
+
 	js, err := response.MockedBody().MarshalJSON()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 	w.Write(js)
 }

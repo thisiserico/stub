@@ -51,19 +51,22 @@ func prepareTestHandler(t *testing.T) *testHandler {
 }
 
 type expectationPayload struct {
-	Method  string              `json:"using_method"`
-	Path    string              `json:"against_path"`
-	Headers map[string][]string `json:"with_headers"`
+	Method     string              `json:"using_method"`
+	Path       string              `json:"against_path"`
+	ReqHeaders map[string][]string `json:"with_headers"`
 
-	Response interface{} `json:"with_response"`
+	StatusCode int         `json:"returns_code"`
+	Response   interface{} `json:"with_response"`
 }
 
 func (t *testHandler) givenAMockedGetEndpoint() {
 	js, _ := json.Marshal(expectationPayload{
-		Method:   http.MethodGet,
-		Path:     knownPath,
-		Headers:  map[string][]string{correlationIDHeader: {t.correlationID}},
-		Response: knownResponse,
+		Method:     http.MethodGet,
+		Path:       knownPath,
+		ReqHeaders: map[string][]string{correlationIDHeader: {t.correlationID}},
+
+		StatusCode: http.StatusPartialContent,
+		Response:   knownResponse,
 	})
 
 	uri := fmt.Sprintf("%s/expectation", serviceAddress)
@@ -110,6 +113,10 @@ func (t *testHandler) thenANotImplementedErrorIsReturned() {
 }
 
 func (t *testHandler) thenTheExpectedResponseIsReturned() {
+	if t.respStatusCode != http.StatusPartialContent {
+		t.Fatalf("unexpected status code, want %d, got %d", http.StatusPartialContent, t.respStatusCode)
+	}
+
 	got := t.respBody.(string)
 	if knownResponse != got {
 		t.Fatalf("unexpected response, want %s, got %s", knownResponse, got)
