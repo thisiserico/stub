@@ -51,10 +51,11 @@ func prepareTestHandler(t *testing.T) *testHandler {
 }
 
 type expectationPayload struct {
-	Method   string              `json:"method"`
-	Path     string              `json:"path"`
-	Headers  map[string][]string `json:"headers"`
-	Response interface{}         `json:"response"`
+	Method  string              `json:"using_method"`
+	Path    string              `json:"against_path"`
+	Headers map[string][]string `json:"with_headers"`
+
+	Response interface{} `json:"with_response"`
 }
 
 func (t *testHandler) givenAMockedGetEndpoint() {

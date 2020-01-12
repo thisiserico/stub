@@ -10,10 +10,10 @@ import (
 )
 
 type expectationRequest struct {
-	Method   string          `json:"method"`
-	Path     string          `json:"path"`
-	Headers  headers         `json:"headers"`
-	Response json.RawMessage `json:"response"`
+	Method     string          `json:"using_method"`
+	Path       string          `json:"against_path"`
+	ReqHeaders headers         `json:"with_headers"`
+	Response   json.RawMessage `json:"with_response"`
 }
 
 type headers map[string][]string
@@ -32,13 +32,13 @@ func (c *Client) registerExpectation(w http.ResponseWriter, r *http.Request) {
 		"registering new expectation for %s %s %s",
 		strings.ToUpper(req.Method),
 		req.Path,
-		flattenHeaders(req.Headers),
+		flattenHeaders(req.ReqHeaders),
 	)
 
 	endpoint, err := expectation.For(
 		strings.ToUpper(req.Method),
 		req.Path,
-		req.Headers,
+		req.ReqHeaders,
 	)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
