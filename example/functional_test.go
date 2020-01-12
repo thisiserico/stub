@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/lucsky/cuid"
@@ -37,10 +38,12 @@ func TestUsingAGetRequest(t *testing.T) {
 
 type testHandler struct {
 	*testing.T
+	correlationID string
 
-	correlationID  string
+	expectation    expectationPayload
 	respStatusCode int
 	respBody       interface{}
+	respHeaders    map[string][]string
 }
 
 func prepareTestHandler(t *testing.T) *testHandler {
@@ -55,19 +58,22 @@ type expectationPayload struct {
 	Path       string              `json:"against_path"`
 	ReqHeaders map[string][]string `json:"with_headers"`
 
-	StatusCode int         `json:"returns_code"`
-	Response   interface{} `json:"with_response"`
+	StatusCode  int                 `json:"returns_code"`
+	Response    interface{}         `json:"with_response"`
+	RespHeaders map[string][]string `json:"and_headers"`
 }
 
 func (t *testHandler) givenAMockedGetEndpoint() {
-	js, _ := json.Marshal(expectationPayload{
+	t.expectation = expectationPayload{
 		Method:     http.MethodGet,
 		Path:       knownPath,
 		ReqHeaders: map[string][]string{correlationIDHeader: {t.correlationID}},
 
-		StatusCode: http.StatusPartialContent,
-		Response:   knownResponse,
-	})
+		StatusCode:  http.StatusPartialContent,
+		Response:    knownResponse,
+		RespHeaders: map[string][]string{correlationIDHeader: {t.correlationID}},
+	}
+	js, _ := json.Marshal(t.expectation)
 
 	uri := fmt.Sprintf("%s/expectation", serviceAddress)
 	req, err := http.NewRequest(http.MethodPut, uri, bytes.NewBuffer(js))
@@ -75,12 +81,10 @@ func (t *testHandler) givenAMockedGetEndpoint() {
 		t.Fatal(err)
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	_, err = http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	t.respStatusCode = resp.StatusCode
 }
 
 func (t *testHandler) whenHittingAGetEndpoint() {
@@ -104,6 +108,7 @@ func (t *testHandler) whenHittingAGetEndpoint() {
 	}
 
 	t.respStatusCode = resp.StatusCode
+	t.respHeaders = resp.Header
 }
 
 func (t *testHandler) thenANotImplementedErrorIsReturned() {
@@ -113,12 +118,39 @@ func (t *testHandler) thenANotImplementedErrorIsReturned() {
 }
 
 func (t *testHandler) thenTheExpectedResponseIsReturned() {
-	if t.respStatusCode != http.StatusPartialContent {
-		t.Fatalf("unexpected status code, want %d, got %d", http.StatusPartialContent, t.respStatusCode)
+	if t.respStatusCode != t.expectation.StatusCode {
+		t.Fatalf("unexpected status code, want %d, got %d", t.expectation.StatusCode, t.respStatusCode)
 	}
 
-	got := t.respBody.(string)
-	if knownResponse != got {
-		t.Fatalf("unexpected response, want %s, got %s", knownResponse, got)
+	gotResponsePayload := t.respBody.(string)
+	if knownResponse != gotResponsePayload {
+		t.Fatalf("unexpected response, want %s, got %s", knownResponse, gotResponsePayload)
 	}
+
+	if !allHeadersExist(t.expectation.RespHeaders, t.respHeaders) {
+		t.Fatalf("unexoected response headers, want %v, got %v", t.expectation.RespHeaders, t.respHeaders)
+	}
+}
+
+func allHeadersExist(want, got map[string][]string) bool {
+	for wantHeader, wantValues := range want {
+		wantValueStr := strings.ToLower(strings.Join(wantValues, ","))
+
+		var headerFound bool
+		for gotHeader, gotValues := range got {
+			if strings.ToLower(wantHeader) == strings.ToLower(gotHeader) {
+				gotValueStr := strings.ToLower(strings.Join(gotValues, ","))
+				if wantValueStr == gotValueStr {
+					headerFound = true
+					break
+				}
+			}
+		}
+
+		if !headerFound {
+			return false
+		}
+	}
+
+	return true
 }

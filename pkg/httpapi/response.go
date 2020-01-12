@@ -28,6 +28,10 @@ func (c *Client) fetchResponse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for header, values := range response.MockedHeaders() {
+		w.Header().Set(header, strings.Join(values, ","))
+	}
+
 	if statusCode := response.MockedStatusCode(); statusCode != 0 {
 		w.WriteHeader(statusCode)
 	}

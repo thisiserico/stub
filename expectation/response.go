@@ -33,3 +33,8 @@ func (r Response) MockedStatusCode() int {
 func (r Response) MockedBody() json.RawMessage {
 	return r.body
 }
+
+// MockedHeaders returns the response headers.
+func (r Response) MockedHeaders() map[string][]string {
+	return r.headers
+}
