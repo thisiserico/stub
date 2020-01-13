@@ -18,3 +18,12 @@ lint: ## runs the code linter
 build: ## builds the go binary
 	go build -o stub ./cmd/stub
 
+
+.PHONY: pack push # docker commands
+pack: ## builds the docker image
+	docker build -f ./cmd/stub/Dockerfile -t stub .
+
+push: ## pushes the docker image to the registry
+	docker tag stub docker.pkg.github.com/thisiserico/stub:1.0.0
+	docker push docker.pkg.github.com/thisiserico/stub:1.0.0
+

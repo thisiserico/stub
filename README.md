@@ -40,11 +40,15 @@ Once the expectation is created, you can get the given response, status code and
 ## 🧙‍♂️ How to run
 ### Using plain go
 The easiest way to run `stub`, specially when writing tests.
-`go run ./cmd/stub`
+```
+go run ./cmd/stub
+```
 
 ### Using docker
 Run the `docker` image exposing the port `8080`:
-`docker run --rm -p 8080:8080 thisiserico/stub:1.0.0`
+```
+docker run --rm -p 8080:8080 docker.pkg.github.com/thisiserico/stub:1.0.0
+```
 
 ## 🤷‍♀️ What's missing?
 Some handy features are not yet implemented. Feel free to contribute on them!
