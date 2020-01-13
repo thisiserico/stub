@@ -1,12 +1,17 @@
 FROM golang:1.13-alpine as builder
 
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+ENV GOARCH=amd64
+ENV GOFLAGS=-mod=vendor
+
 RUN apk --update add make
 RUN adduser -D -g '' stub
 
 WORKDIR /go/src/github.com/thisiserico/stub
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make build
+RUN make build
 
 
 FROM scratch
