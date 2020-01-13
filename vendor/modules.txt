@@ -1,0 +1,7 @@
+# github.com/lucsky/cuid v1.0.2
+github.com/lucsky/cuid
+# goji.io v2.0.2+incompatible
+goji.io
+goji.io/internal
+goji.io/pat
+goji.io/pattern
