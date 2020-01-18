@@ -1,0 +1,23 @@
+name: build
+on: [push]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - name: lint
+      uses: cedrickring/golang-action/go1.13@1.4.1
+      with:
+        args: make setup lint
+      env:
+        GOFLAGS: "-mod=vendor"
+
+    - name: build
+      uses: cedrickring/golang-action/go1.13@1.4.1
+      with:
+        args: make build
+      env:
+        GOFLAGS: "-mod=vendor"
+
