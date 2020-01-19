@@ -9,13 +9,16 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
+    - name: parse release version
+      run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
+
     - name: publish
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
         name: thisiserico/stub/stub
         registry: docker.pkg.github.com
         dockerfile: ./cmd/stub/Dockerfile
-        username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
-        password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-        tags: "latest,${{ github.ref }}"
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+        tags: "latest,${{ env.RELEASE_VERSION }}"
 
