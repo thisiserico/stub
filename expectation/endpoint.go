@@ -3,6 +3,7 @@ package expectation
 import (
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // Endpoint encapsulates client requests.
@@ -18,10 +19,20 @@ func For(method, path string, headers map[string][]string) (Endpoint, error) {
 		return Endpoint{}, fmt.Errorf("forbidden method %s", method)
 	}
 
+	sanitizedHeaders := make(map[string][]string)
+	for header, values := range headers {
+		sanitizedValues := make([]string, 0, len(values))
+		for _, value := range values {
+			sanitizedValues = append(sanitizedValues, strings.ToLower(value))
+		}
+
+		sanitizedHeaders[strings.ToLower(header)] = sanitizedValues
+	}
+
 	return Endpoint{
 		method:  method,
 		path:    path,
-		headers: headers,
+		headers: sanitizedHeaders,
 	}, nil
 }
 
