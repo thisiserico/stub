@@ -47,7 +47,7 @@ go run ./cmd/stub
 ### Using docker
 Run the `docker` image exposing the port `8080`:
 ```
-docker run --rm -p 8080:8080 docker.pkg.github.com/thisiserico/stub:1.0.0
+docker run --rm -p 8080:8080 thisiserico/stub:v1.0.3
 ```
 
 ## 🤷‍♀️ What's missing?
