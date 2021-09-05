@@ -6,18 +6,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '^1.17.0'
 
     - name: lint
-      uses: cedrickring/golang-action/go1.13@1.4.1
-      with:
-        args: make setup lint
-      env:
-        GOFLAGS: "-mod=vendor"
+      run: make setup lint
 
     - name: build
-      uses: cedrickring/golang-action/go1.13@1.4.1
-      with:
-        args: make build
-      env:
-        GOFLAGS: "-mod=vendor"
-
+      run: make build
