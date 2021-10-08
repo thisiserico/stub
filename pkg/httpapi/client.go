@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -29,7 +30,7 @@ func New() *Client {
 }
 
 // Serve runs an http server with a single handler to catch them all.
-func (c *Client) Serve() {
+func (c *Client) Serve(ctx context.Context) {
 	log.Println("registering stub routes")
 	c.mux.HandleFunc(pat.Put("/expectation"), c.registerExpectation)
 	c.mux.HandleFunc(pat.New("/*"), c.fetchResponse)
@@ -45,10 +46,15 @@ func (c *Client) Serve() {
 		Handler: c.mux,
 	}
 
-	log.Println("serving http requests")
-	if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
-		log.Fatal(err)
-	}
+	go func() {
+		log.Println("serving http requests")
+		if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
+			log.Fatal(err)
+		}
+	}()
+
+	<-ctx.Done()
+	_ = server.Shutdown(ctx)
 }
 
 func flattenHeaders(headers map[string][]string) string {

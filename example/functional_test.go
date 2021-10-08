@@ -27,7 +27,7 @@ func TestUsingAGetRequest(t *testing.T) {
 		test.thenANotImplementedErrorIsReturned()
 	})
 
-	t.Run("the service prepared for", func(t *testing.T) {
+	t.Run("the service is prepared for", func(t *testing.T) {
 		test := prepareTestHandler(t)
 
 		test.givenAMockedGetEndpoint()
