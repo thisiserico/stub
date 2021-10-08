@@ -23,4 +23,3 @@ build: ## builds the go binary
 .PHONY: pack # docker commands
 pack: ## builds the docker image
 	docker build -f ./cmd/stub/Dockerfile -t stub .
-

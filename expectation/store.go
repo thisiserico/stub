@@ -5,6 +5,8 @@ import (
 	"sync"
 )
 
+const expectationNotFound = -1
+
 // Store provides utilities to register and fetch responses for endpoints.
 type Store interface {
 	Register(Endpoint, Response) error
@@ -29,18 +31,29 @@ func (s *store) Register(e Endpoint, r Response) error {
 	s.Lock()
 	defer s.Unlock()
 
-	// TODO check whether it already exists, overwrite if so.
-	s.expectations = append(s.expectations, responseForEndpoint(e, r))
+	if index := s.findExpectation(e); index != expectationNotFound {
+		s.expectations[index] = responseForEndpoint(e, r)
+		return nil
+	}
 
+	s.expectations = append(s.expectations, responseForEndpoint(e, r))
 	return nil
 }
 
 func (s *store) Fetch(e Endpoint) (Response, error) {
-	for _, expectation := range s.expectations {
-		if expectation.matches(e) {
-			return expectation.response, nil
-		}
+	if index := s.findExpectation(e); index != expectationNotFound {
+		return s.expectations[index].response, nil
 	}
 
 	return nonExistingResponse, errors.New("unknown endpoint")
+}
+
+func (s *store) findExpectation(e Endpoint) int {
+	for i, expectation := range s.expectations {
+		if expectation.matches(e) {
+			return i
+		}
+	}
+
+	return expectationNotFound
 }

@@ -14,7 +14,7 @@ func main() {
 	ctx := prepareShutdown()
 
 	apiClient := httpapi.New()
-	go apiClient.Serve()
+	go apiClient.Serve(ctx)
 
 	<-ctx.Done()
 }

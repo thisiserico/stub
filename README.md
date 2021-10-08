@@ -54,6 +54,4 @@ docker run --rm -p 8080:8080 thisiserico/stub:v1.0.3
 Some handy features are not yet implemented. Feel free to contribute on them!
 * Delete previously created expectation
 * Delete all previously created expectations
-* Overwrite already existing expectations
 * Test different scenarios
-
